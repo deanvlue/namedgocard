@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/md5"
 	"flag"
 	"fmt"
@@ -21,19 +22,33 @@ func init() {
 }
 
 var (
-	wonb     = flag.Bool("whiteonblack", false, "white text on black background")
-	fontfile = flag.String("fontfile", "./resources/font/AvenirLTStd-Heavy.ttf", "filename of the ttf font")
-	dpi      = flag.Float64("dpi", 72, "screen resolution")
-	hinting  = flag.String("hinting", "full", "none|full")
-	size     = flag.Float64("size", 86, "font size in points")
-	spacing  = flag.Float64("spacing", 1.5, "line spacing")
-	name     = flag.String("name", "Carlos Muñoz", "Nombre del Usuario")
+	wonb = flag.Bool("whiteonblack", false, "white text on black background")
+	//fontfile = flag.String("fontfile", "resources/font/AvenirLTStd-Heavy.ttf", "filename of the ttf font")
+	dpi     = flag.Float64("dpi", 72, "screen resolution")
+	hinting = flag.String("hinting", "full", "none|full")
+	size    = flag.Float64("size", 86, "font size in points")
+	spacing = flag.Float64("spacing", 1.5, "line spacing")
+	name    = flag.String("name", "Carlos Muñoz", "Nombre del Usuario")
 )
 
 //var name = "Carlos Muñoz"
 
 func main() {
-	goldCard, err := os.Open("./resources/goldcard.jpg")
+
+	/**** LOAD ASSETS *****/
+	goldCard, err := Asset("resources/goldcard.jpg")
+	if err != nil {
+		log.Println("Gold card not found")
+		os.Exit(1)
+	}
+
+	fontfile, err := Asset("resources/font/AvenirLTStd-Heavy.ttf")
+	if err != nil {
+		log.Println("Font not found")
+		os.Exit(1)
+	}
+
+	//goldCard, err := os.Open("./resources/goldcard.jpg")
 	flag.Parse()
 
 	// TODO: Paresear el nombre, solo dejar los dos primeras palabras
@@ -85,11 +100,12 @@ func main() {
 		return
 	}
 
-	defer goldCard.Close()
+	//defer goldCard.Close()
 
 	//bg := image.Black
 
-	img, _, err := image.Decode(goldCard) // abre la imagen
+	//img, _, err := image.Decode(goldCard) // abre la imagen
+	img, _, err := image.Decode(bytes.NewReader(goldCard)) // abre la imagen embebida
 	rgba := image.NewRGBA(image.Rect(0, 0, 948, 597))
 	//draw.Draw(rgba, rgba.Bounds(), bg, image.ZP, draw.Src)
 	draw.Draw(rgba, rgba.Bounds(), img, image.ZP, draw.Src)
