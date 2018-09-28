@@ -9,7 +9,6 @@ import (
 	"image/draw"
 	"image/jpeg"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -42,7 +41,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fontfile, err := Asset("resources/font/AvenirLTStd-Heavy.ttf")
+	fontfile, err := Asset("resources/avenir_font.ttf")
 	if err != nil {
 		log.Println("Font not found")
 		os.Exit(1)
@@ -88,13 +87,15 @@ func main() {
 		os.Exit(1)
 	}
 
-	fontBytes, err := ioutil.ReadFile(*fontfile)
+	//fontBytes, err := ioutil.ReadFile(*fontfile)
+	/*fontBytes, err := bytes.NewReader(fontfile)
 	if err != nil {
 		fmt.Println("la fuente no fue encontrada")
 		os.Exit(1)
-	}
+	}*/
 
-	f, err := freetype.ParseFont(fontBytes)
+	//f, err := freetype.ParseFont(fontBytes)
+	f, err := freetype.ParseFont(fontfile)
 	if err != nil {
 		fmt.Println(err)
 		return
