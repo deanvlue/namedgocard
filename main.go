@@ -1,11 +1,13 @@
 package main
 
 import (
+	"crypto/md5"
 	"flag"
 	"fmt"
 	"image"
 	"image/draw"
 	"image/jpeg"
+	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -33,7 +35,38 @@ var (
 func main() {
 	goldCard, err := os.Open("./resources/goldcard.jpg")
 	flag.Parse()
+
+	// TODO: Paresear el nombre, solo dejar los dos primeras palabras
+	// hacer un hash de ese nombre
+	h := md5.New()
+	io.WriteString(h, *name)
+
+	nameHash := h.Sum(nil)
+
+	// verificar si ya existe un documento con ese nombre
+	// si no, lo genera [HASH].jpg y lo guarda
+	// si sí solo lo regresa.
+
+	//strNameHash := string(nameHash[:16])
+	strNameHash := fmt.Sprintf("%x", nameHash)
+	//strNameHash := bytes.IndexByte(nameHash, 0)
 	log.Print(*name)
+	log.Print(strNameHash)
+	//fmt.Println(strNameHash)
+
+	//checks if the file already exists
+	var fileName = strNameHash + ".jpg"
+
+	fe, err := fileExists(fileName)
+	if fe {
+		log.Println("Ya existe el archivo ", fileName)
+		os.Exit(1)
+	}
+
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 
 	if err != nil {
 		fmt.Println("la imagen no fue encontrada")
@@ -86,7 +119,8 @@ func main() {
 	}
 
 	/* ** guarda la imagen a disco ** */
-	outFile, err := os.Create("out.jpg")
+
+	outFile, err := os.Create(fileName)
 	if err != nil {
 		log.Println(err)
 		os.Exit(1)
@@ -129,4 +163,15 @@ func main() {
 
 	fmt.Println("archivo escrito")
 
+}
+
+func fileExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return true, err
 }
